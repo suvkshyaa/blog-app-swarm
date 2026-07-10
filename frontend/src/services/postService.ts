@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const viteEnv = (import.meta as ImportMeta & { env?: Record<string, string> }).env;
-const API_URL = viteEnv?.VITE_API_URL || 'http://localhost:5000/api/posts';
+const API_URL = viteEnv?.VITE_API_URL || 'http://backend:5000/api/posts';
 
 export interface Post {
   _id?: string;
