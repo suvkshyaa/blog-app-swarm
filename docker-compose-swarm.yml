@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  database:
+    image: mysql:8.0
+    env_file:
+      - .env
+    networks:
+      - chatbot-network
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  backend:
+    image: yourrepo/chatbot-backend:latest
+    env_file:
+      - ./backend/.env
+    networks:
+      - chatbot-network
+    ports:
+      - "5000:5000"
+    depends_on:
+      - database
+    deploy:
+      mode: replicated
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        delay: 10s
+
+  frontend:
+    image: yourrepo/chatbot-frontend:latest
+    networks:
+      - chatbot-network
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    deploy:
+      mode: replicated
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+
+networks:
+  chatbot-network:
+    driver: overlay
+
+volumes:
+  mysql_data:
