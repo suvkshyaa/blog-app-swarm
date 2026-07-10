@@ -33,6 +33,9 @@ services:
 
   frontend:
     image: chatbot-frontend:latest
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=backend:5001/api/posts
     networks:
       - chatbot-network
     ports:
@@ -44,6 +47,8 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
+
+    
 
 networks:
   chatbot-network:
