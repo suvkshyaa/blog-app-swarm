@@ -35,7 +35,7 @@ services:
     image: chatbot-frontend:latest
     environment:
       - NODE_ENV=development
-      - VITE_API_URL=http://backend:5000/api/posts
+      - VITE_API_URL=http://backend:5002/api/posts
     networks:
       - chatbot-network
     ports:
