@@ -1,24 +1,17 @@
 version: '3.8'
 services:
-  database:
-    image: mysql:8.0
-    env_file:
-      - .env
+  mongo:
+    image: mongo:7
     networks:
       - chatbot-network
     volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+      - mongo_data:/data/db
     deploy:
       mode: replicated
       replicas: 1
       restart_policy:
         condition: on-failure
+
   backend:
     image: chatbot-backend:latest
     env_file:
@@ -28,7 +21,7 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - database
+      - mongo
     deploy:
       mode: replicated
       replicas: 2
@@ -37,6 +30,7 @@ services:
       update_config:
         parallelism: 1
         delay: 10s
+
   frontend:
     image: chatbot-frontend:latest
     networks:
@@ -50,8 +44,10 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
+
 networks:
   chatbot-network:
     driver: overlay
+
 volumes:
-  mysql_data:
+  mongo_data:
